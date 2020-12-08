@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlTypes;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -33,10 +34,42 @@ namespace LatvanyossagokApplication
                 reader.Close();
             }
         }
+        void LatvanyossagBetoltes()
+        {
+            int vid = VarosID(Convert.ToString(listBox1.SelectedItem).Split(' ')[0]);
+            if(vid !=-1)
+            {
+                string sql = "SELECT id, nev, leiras, ar, varos_id FROM latvanyossagok WHERE varos_id = " + vid + "";
+                var comm = this.conn.CreateCommand();
+                comm.CommandText = sql;
+                using (var reader = comm.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int id = reader.GetInt32("id");
+                        string nev = reader.GetString("nev");
+                        string leiras = reader.GetString("leiras");
+                        int ar = reader.GetInt32("ar");
+                        int varosId = reader.GetInt32("varos_id");
+                        if (ar != 0)
+                        {
+                            listBox2.Items.Add(nev + ar);
+                        }
+                        else
+                        {
+                            listBox2.Items.Add(nev + "Ingyenes");
+                        }
+                    }
+                    reader.Close();
+                }
+               
+            }
+            
+        }
         int VarosID(string nev)
         {
-            int ki=0;
-            string sql = "SELECT id FROM varosok WHERE nev LIKE "+nev+"";
+            int ki=-1;
+            string sql = "SELECT id FROM varosok WHERE nev LIKE '"+nev+"'";
             var comm = this.conn.CreateCommand();
             comm.CommandText = sql;
             using (var reader = comm.ExecuteReader())
@@ -125,6 +158,7 @@ namespace LatvanyossagokApplication
             comm.ExecuteNonQuery();
             listBox1.Items.Clear();
             VarosBetoltes();
+
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -132,6 +166,63 @@ namespace LatvanyossagokApplication
            
             int varosid = VarosID(Convert.ToString(listBox1.SelectedItem).Split(' ')[0]);
             string sql = "INSERT INTO `latvanyossagok`(`nev`, `leiras`, `ar`, `varos_id`) VALUES (" + textBox2.Text + "," + textBox3.Text + "," + numericUpDown2.Value + "," +varosid+ ")";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+            int varosid = VarosID(Convert.ToString(listBox1.SelectedItem).Split(' ')[0]);
+            string sql = "DELETE FROM `latvanyossagok` WHERE varos_id LIKE "+varosid+"";
+            listBox1.Items.Clear();
+            VarosBetoltes();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            panel1.Visible = true;
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(listBox1.SelectedItem!=null)
+            {
+                button3.Enabled = true;
+                button4.Enabled = true;
+                panel3.Enabled = true;
+                LatvanyossagBetoltes();
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string nev = Convert.ToString(listBox1.SelectedItem).Split(' ')[0];
+            string sql = @"UPDATE `varosok` 
+                            `nev`=" + textBox4.Text + ",`lakossag`=" + numericUpDown4.Value + "" +
+                            " WHERE nev LIKE "+nev+"";
+            listBox1.Items.Clear();
+            VarosBetoltes();
+            panel1.Visible = false;
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+            panel2.Visible = false;
+        }
+
+        private void panel3_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

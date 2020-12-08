@@ -31,7 +31,7 @@ namespace LatvanyossagokApplication
 
         public override string ToString()
         {
-            return this.nev + " " + this.leiras + " " + this.ar + " ";
+            return this.nev + " " + this.ar + " Ft";
         }
     }
 }
